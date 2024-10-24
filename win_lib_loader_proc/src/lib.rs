@@ -50,8 +50,12 @@ pub fn load_from_dll(_attr: TokenStream, _item: TokenStream) -> TokenStream {
                 .iter()
                 .enumerate()
                 .map(|(i, input)| {
+                    let name = &input.name;
                     let ty = &input.ty;
-                    let name = format_ident!("__arg_{}", i);
+                    let name = match name{
+                        Some((name,_)) => name.clone(),
+                        None => format_ident!("__arg_{}", i),
+                    };
                     (name.clone(), quote! {#name : #ty})
                 })
                 .collect::<Vec<_>>();
