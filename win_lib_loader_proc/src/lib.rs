@@ -77,7 +77,6 @@ pub fn load_from_dll(_attr: TokenStream, _item: TokenStream) -> TokenStream {
     let field_names = functions.iter().map(|x| &x.3).collect::<Vec<_>>();
 
     let struct_definition = quote! {
-        #[allow(non_snake_case)]
         #struct_visibility struct #struct_name{
             win_library: ::win_lib_loader::WinLibrary,
             #(#field_definitions),*
