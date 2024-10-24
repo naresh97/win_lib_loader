@@ -1,3 +1,8 @@
+//! Easy way for loading Windows DLLs
+//!
+//! Provides a light wrapper to the Windows API calls for loading DLL libraries,
+//! as well as an attribute macro that allows easy definition of the interfaces
+
 #![no_std]
 
 extern crate alloc;
@@ -18,6 +23,16 @@ use winapi::{
     },
 };
 
+/// Provides a wrapper for loading a DLL library
+///
+/// # Example
+/// ```
+/// use win_lib_loader::WinLibrary;
+/// let test_dll = WinLibrary::load("testdll.dll").unwrap();
+/// type AddFn = fn(i32,i32)->i32;
+/// let add_fn = test_dll.get_function::<AddFn>("add").unwrap();
+/// assert_eq!(8, add_fn(5,3));
+/// ```
 pub struct WinLibrary {
     handle: &'static mut HINSTANCE__,
 }
