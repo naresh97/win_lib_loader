@@ -12,7 +12,10 @@ use alloc::{ffi::CString, string::ToString};
 use error::LoaderError;
 use winapi::{
     shared::minwindef::HINSTANCE__,
-    um::libloaderapi::{GetProcAddress, LoadLibraryA},
+    um::{
+        errhandlingapi::GetLastError,
+        libloaderapi::{GetProcAddress, LoadLibraryA},
+    },
 };
 
 pub struct WinLibrary {
@@ -23,8 +26,10 @@ impl WinLibrary {
         let name = CString::new(filename)
             .map_err(|_| LoaderError::InterfaceError("Could not make CString".to_string()))?;
 
-        let handle =
-            unsafe { LoadLibraryA(name.as_ptr()).as_mut() }.ok_or(LoaderError::LibraryLoadError)?;
+        let handle = unsafe { LoadLibraryA(name.as_ptr()).as_mut() }.ok_or_else(|| {
+            let err = unsafe { GetLastError() };
+            LoaderError::LibraryLoadError(err)
+        })?;
 
         Ok(WinLibrary { handle })
     }

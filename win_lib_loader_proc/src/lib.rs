@@ -1,5 +1,5 @@
 use proc_macro::TokenStream;
-use quote::{format_ident, quote};
+use quote::{format_ident, quote, ToTokens};
 use syn::parse_macro_input;
 
 #[proc_macro_attribute]
@@ -31,6 +31,15 @@ pub fn load_from_dll(_attr: TokenStream, _item: TokenStream) -> TokenStream {
         .named
         .iter()
         .filter_map(|field| {
+            let custom_name = field.attrs.iter().find(|attr|{
+                attr.path().get_ident().map(|i| i == "name").unwrap_or(false)
+            }).map(|attr|{
+                match &attr.meta{
+                    syn::Meta::List(meta_list) => Some(meta_list.tokens.clone()),
+                    _ => None
+                }
+            }).flatten();
+
             let function_name = field.ident.as_ref().unwrap();
             let function_type = &field.ty;
             let function_type = match function_type {
@@ -67,7 +76,7 @@ pub fn load_from_dll(_attr: TokenStream, _item: TokenStream) -> TokenStream {
                 }
             };
 
-            let function_name_str = format!("{}", function_name);
+            let function_name_str =  custom_name.unwrap_or_else(||format!("{}", function_name).to_token_stream());
             let assignment = quote! {
                 let #field_name = _lib.get_function::<#function_type>(#function_name_str)?;
             };

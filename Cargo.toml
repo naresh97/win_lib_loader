@@ -7,6 +7,9 @@ authors = ["Nareshkumar Rao"]
 [dependencies]
 win_lib_loader_proc = { path = "./win_lib_loader_proc", version = "*" }
 
+[dev-dependencies]
+tests = { path = "./tests", version = "*" }
+
 [dependencies.winapi]
 version = "0.3.9"
-features = ["minwindef", "libloaderapi"]
+features = ["minwindef", "libloaderapi", "errhandlingapi"]
