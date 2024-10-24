@@ -105,7 +105,5 @@ pub fn load_from_dll(_attr: TokenStream, _item: TokenStream) -> TokenStream {
         #implementation
     };
 
-    println!("{}", full);
-
     full.into()
 }
